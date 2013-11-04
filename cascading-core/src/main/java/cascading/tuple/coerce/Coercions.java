@@ -198,7 +198,7 @@ public final class Coercions
    * @param <T>   the type expected
    * @return the coerced value
    */
-  public static final <T> T coerce( Object value, Type type )
+  public static <T> T coerce( Object value, Type type )
     {
     Coerce<T> coerce = coercionsPrivate.get( type );
 
@@ -219,7 +219,7 @@ public final class Coercions
    * @param type        the type to coerce to via any mapped CoercibleType
    * @return the coerced value
    */
-  public static final Object coerce( CoercibleType currentType, Object value, Type type )
+  public static Object coerce( CoercibleType currentType, Object value, Type type )
     {
     if( currentType.equals( type ) )
       return value;
@@ -309,14 +309,17 @@ public final class Coercions
     String[] names = new String[ types.length ];
 
     for( int i = 0; i < types.length; i++ )
-      {
-      if( Class.class.isInstance( types[ i ] ) )
-        names[ i ] = ( (Class) types[ i ] ).getName();
-      else
-        names[ i ] = types[ i ].getClass().getName();
-      }
+      names[ i ] = getTypeName( types[ i ] );
 
     return names;
+    }
+
+  public static String getTypeName( Type type )
+    {
+    if( Class.class.isInstance( type ) )
+      return ( (Class) type ).getName();
+    else
+      return type.getClass().getName();
     }
 
   public static Type[] getTypes( String[] names )

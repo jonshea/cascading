@@ -59,7 +59,8 @@ public class HadoopFlowProcess extends FlowProcess<JobConf>
   /** Field isMapper */
   private final boolean isMapper;
   /** Field reporter */
-  Reporter reporter = Reporter.NULL;
+  private Reporter reporter = Reporter.NULL;
+  /** Field outputCollector */
   private OutputCollector outputCollector;
 
   public HadoopFlowProcess()
