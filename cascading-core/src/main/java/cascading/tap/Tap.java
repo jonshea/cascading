@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2016-2017 Chris K Wensel. All Rights Reserved.
  * Copyright (c) 2007-2017 Xplenty, Inc. All Rights Reserved.
  *
  * Project and contact information: http://www.cascading.org/
@@ -20,9 +21,15 @@
 
 package cascading.tap;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UncheckedIOException;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import cascading.flow.Flow;
 import cascading.flow.FlowElement;
@@ -40,6 +47,7 @@ import cascading.scheme.Scheme;
 import cascading.tuple.Fields;
 import cascading.tuple.FieldsResolverException;
 import cascading.tuple.Tuple;
+import cascading.tuple.TupleEntry;
 import cascading.tuple.TupleEntryCollector;
 import cascading.tuple.TupleEntryIterator;
 import cascading.util.TraceUtil;
@@ -758,6 +766,98 @@ public abstract class Tap<Config, Input, Output> implements ScopedElement, FlowE
   public boolean hasStepConfigDef()
     {
     return stepConfigDef != null && !stepConfigDef.isEmpty();
+    }
+
+  public Spliterator<TupleEntry> spliterator( FlowProcess<? extends Config> flowProcess )
+    {
+    return splititerator( openForReadUnchecked( flowProcess ) );
+    }
+
+  protected TupleEntryIterator openForReadUnchecked( FlowProcess<? extends Config> flowProcess )
+    {
+    try
+      {
+      return openForRead( flowProcess );
+      }
+    catch( IOException exception )
+      {
+      throw new UncheckedIOException( exception );
+      }
+    }
+
+  protected Spliterator<TupleEntry> splititerator( TupleEntryIterator iterator )
+    {
+    return Spliterators.spliteratorUnknownSize( iterator, 0 );
+    }
+
+  public Stream<TupleEntry> entryStream( FlowProcess<? extends Config> flowProcess )
+    {
+    TupleEntryIterator iterator = openForReadUnchecked( flowProcess );
+    Spliterator<TupleEntry> spliterator = splititerator( iterator );
+
+    try
+      {
+      return StreamSupport
+        .stream( spliterator, false )
+        .onClose( asUncheckedRunnable( iterator ) );
+      }
+    catch( Error | RuntimeException e )
+      {
+      try
+        {
+        iterator.close();
+        }
+      catch( IOException ex )
+        {
+        try
+          {
+          e.addSuppressed( ex );
+          }
+        catch( Throwable ignore ){}
+        }
+
+      throw e;
+      }
+    }
+
+  public Stream<TupleEntry> entryStream( FlowProcess<? extends Config> flowProcess, Fields selector )
+    {
+    return entryStream( flowProcess ).map( tupleEntry -> tupleEntry.selectEntry( selector ) );
+    }
+
+  public Stream<Tuple> tupleStream( FlowProcess<? extends Config> flowProcess )
+    {
+    return entryStream( flowProcess ).map( TupleEntry::getTuple );
+    }
+
+  public Stream<Tuple> tupleStreamCopy( FlowProcess<? extends Config> flowProcess )
+    {
+    return entryStream( flowProcess ).map( TupleEntry::getTupleCopy );
+    }
+
+  public Stream<Tuple> tupleStream( FlowProcess<? extends Config> flowProcess, Fields selector )
+    {
+    return entryStream( flowProcess ).map( tupleEntry -> tupleEntry.selectTuple( selector ) );
+    }
+
+  public Stream<Tuple> tupleStreamCopy( FlowProcess<? extends Config> flowProcess, Fields selector )
+    {
+    return entryStream( flowProcess ).map( tupleEntry -> tupleEntry.selectTupleCopy( selector ) );
+    }
+
+  private static Runnable asUncheckedRunnable( Closeable closeable )
+    {
+    return () ->
+    {
+    try
+      {
+      closeable.close();
+      }
+    catch( IOException e )
+      {
+      throw new UncheckedIOException( e );
+      }
+    };
     }
 
   @Override
