@@ -24,6 +24,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import cascading.PlatformTestCase;
 import cascading.flow.Flow;
@@ -155,5 +159,89 @@ public class TapStreamPlatformTest extends PlatformTestCase
       .collect( Collectors.toSet() ); // correct
 
     assertEquals( 20, new HashSet<>( collect3 ).size() ); // re-hash
+    }
+
+  @Test
+  public void testTupleEntryWriter() throws Exception
+    {
+    getPlatform().copyFromLocal( inputFileNums20 );
+
+    FlowProcess flowProcess = getPlatform().getFlowProcess();
+    Tap source = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", inputFileNums20 );
+    Tap sink = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", getOutputPath() );
+
+    Stream<TupleEntry> stream = TupleEntryStream.entryStream( source, flowProcess );
+
+    Tap result = TupleEntryStream.writeEntry( stream::iterator, sink, flowProcess );
+
+    assertEquals( 20, TupleEntryStream.entryStream( result, flowProcess ).count() );
+    }
+
+  @Test
+  public void testTupleEntryTupleWriter() throws Exception
+    {
+    getPlatform().copyFromLocal( inputFileNums20 );
+
+    FlowProcess flowProcess = getPlatform().getFlowProcess();
+    Tap source = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", inputFileNums20 );
+    Tap sink = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", getOutputPath() );
+
+    Stream<Tuple> stream = TupleEntryStream.entryStream( source, flowProcess )
+      .map( entry -> entry.selectTuple( new Fields( "num" ) ) );
+
+    Tap result = TupleStream.writeTuple( stream, sink, flowProcess );
+
+    assertEquals( 20, TupleEntryStream.entryStream( result, flowProcess ).count() );
+    }
+
+  @Test
+  public void testTupleEntryIntWriter() throws Exception
+    {
+    getPlatform().copyFromLocal( inputFileNums20 );
+
+    FlowProcess flowProcess = getPlatform().getFlowProcess();
+    Tap source = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", inputFileNums20 );
+    Tap sink = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", getOutputPath() );
+
+    IntStream stream = TupleEntryStream.entryStream( source, flowProcess )
+      .mapToInt( TupleEntryStream.fieldToInt( new Fields( "num" ) ) );
+
+    Tap result = TupleStream.writeInt( stream, sink, flowProcess );
+
+    assertEquals( 20, TupleEntryStream.entryStream( result, flowProcess ).count() );
+    }
+
+  @Test
+  public void testTupleEntryLongWriter() throws Exception
+    {
+    getPlatform().copyFromLocal( inputFileNums20 );
+
+    FlowProcess flowProcess = getPlatform().getFlowProcess();
+    Tap source = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", inputFileNums20 );
+    Tap sink = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", getOutputPath() );
+
+    LongStream stream = TupleEntryStream.entryStream( source, flowProcess )
+      .mapToLong( TupleEntryStream.fieldToLong( new Fields( "num" ) ) );
+
+    Tap result = TupleStream.writeLong( stream, sink, flowProcess );
+
+    assertEquals( 20, TupleEntryStream.entryStream( result, flowProcess ).count() );
+    }
+
+  @Test
+  public void testTupleEntryDoubleWriter() throws Exception
+    {
+    getPlatform().copyFromLocal( inputFileNums20 );
+
+    FlowProcess flowProcess = getPlatform().getFlowProcess();
+    Tap source = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", inputFileNums20 );
+    Tap sink = getPlatform().getDelimitedFile( new Fields( "num", Integer.class ), " ", getOutputPath() );
+
+    DoubleStream stream = TupleEntryStream.entryStream( source, flowProcess )
+      .mapToDouble( TupleEntryStream.fieldToDouble( new Fields( "num" ) ) );
+
+    Tap result = TupleStream.writeDouble( stream, sink, flowProcess );
+
+    assertEquals( 20, TupleEntryStream.entryStream( result, flowProcess ).count() );
     }
   }

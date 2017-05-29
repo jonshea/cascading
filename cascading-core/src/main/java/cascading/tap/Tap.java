@@ -790,6 +790,15 @@ public abstract class Tap<Config, Input, Output> implements ScopedElement, FlowE
     return Spliterators.spliteratorUnknownSize( iterator, 0 );
     }
 
+  /**
+   * Method entryStream returns a {@link Stream} of {@link TupleEntry} instances from the given
+   * {@link Tap} instance.
+   * <p>
+   * Also see {@link cascading.tuple.TupleEntryStream#entryStream(Tap, FlowProcess)}.
+   *
+   * @param flowProcess represents the current platform configuration
+   * @return a Stream of TupleEntry instances
+   */
   public Stream<TupleEntry> entryStream( FlowProcess<? extends Config> flowProcess )
     {
     TupleEntryIterator iterator = openForReadUnchecked( flowProcess );
@@ -801,45 +810,128 @@ public abstract class Tap<Config, Input, Output> implements ScopedElement, FlowE
         .stream( spliterator, false )
         .onClose( asUncheckedRunnable( iterator ) );
       }
-    catch( Error | RuntimeException e )
+    catch( Error | RuntimeException error )
       {
       try
         {
         iterator.close();
         }
-      catch( IOException ex )
+      catch( IOException exception )
         {
         try
           {
-          e.addSuppressed( ex );
+          error.addSuppressed( exception );
           }
         catch( Throwable ignore ){}
         }
 
-      throw e;
+      throw error;
       }
     }
 
+  /**
+   * Method entryStreamCopy returns a {@link Stream} of {@link TupleEntry} instances from the given
+   * {@link Tap} instance.
+   * <p>
+   * This method returns an TupleEntry instance suitable for caching.
+   * <p>
+   * Also see {@link cascading.tuple.TupleEntryStream#entryStreamCopy(Tap, FlowProcess)}.
+   *
+   * @param flowProcess represents the current platform configuration
+   * @return a Stream of TupleEntry instances
+   */
+  public Stream<TupleEntry> entryStreamCopy( FlowProcess<? extends Config> flowProcess )
+    {
+    return entryStream( flowProcess ).map( TupleEntry::new );
+    }
+
+  /**
+   * Method entryStream returns a {@link Stream} of {@link TupleEntry} instances from the given
+   * {@link Tap} instance.
+   * <p>
+   * Also see {@link cascading.tuple.TupleEntryStream#entryStream(Tap, FlowProcess, Fields)}.
+   *
+   * @param flowProcess represents the current platform configuration
+   * @param selector    the fields to select from the underlying TupleEntry
+   * @return a Stream of TupleEntry instances
+   */
   public Stream<TupleEntry> entryStream( FlowProcess<? extends Config> flowProcess, Fields selector )
     {
     return entryStream( flowProcess ).map( tupleEntry -> tupleEntry.selectEntry( selector ) );
     }
 
+  /**
+   * Method entryStreamCopy returns a {@link Stream} of {@link TupleEntry} instances from the given
+   * {@link Tap} instance.
+   * <p>
+   * Also see {@link cascading.tuple.TupleEntryStream#entryStreamCopy(Tap, FlowProcess)}.
+   *
+   * @param flowProcess represents the current platform configuration
+   * @param selector    the fields to select from the underlying TupleEntry
+   * @return a Stream of TupleEntry instances
+   */
+  public Stream<TupleEntry> entryStreamCopy( FlowProcess<? extends Config> flowProcess, Fields selector )
+    {
+    return entryStream( flowProcess ).map( tupleEntry -> tupleEntry.selectEntryCopy( selector ) );
+    }
+
+  /**
+   * Method tupleStream returns a {@link Stream} of {@link Tuple} instances from the given
+   * {@link Tap} instance.
+   * <p>
+   * Also see {@link cascading.tuple.TupleStream#tupleStream(Tap, FlowProcess)}.
+   *
+   * @param flowProcess represents the current platform configuration
+   * @return a Stream of Tuple instances
+   */
   public Stream<Tuple> tupleStream( FlowProcess<? extends Config> flowProcess )
     {
     return entryStream( flowProcess ).map( TupleEntry::getTuple );
     }
 
+  /**
+   * Method tupleStreamCopy returns a {@link Stream} of {@link Tuple} instances from the given
+   * {@link Tap} instance.
+   * <p>
+   * This method returns an Tuple instance suitable for caching.
+   * <p>
+   * Also see {@link cascading.tuple.TupleStream#tupleStreamCopy(Tap, FlowProcess)}.
+   *
+   * @param flowProcess represents the current platform configuration
+   * @return a Stream of Tuple instances
+   */
   public Stream<Tuple> tupleStreamCopy( FlowProcess<? extends Config> flowProcess )
     {
     return entryStream( flowProcess ).map( TupleEntry::getTupleCopy );
     }
 
+  /**
+   * Method tupleStream returns a {@link Stream} of {@link Tuple} instances from the given
+   * {@link Tap} instance.
+   * <p>
+   * Also see {@link cascading.tuple.TupleStream#tupleStream(Tap, FlowProcess, Fields)}.
+   *
+   * @param flowProcess represents the current platform configuration
+   * @param selector    the fields to select from the underlying Tuple
+   * @return a Stream of TupleE instances
+   */
   public Stream<Tuple> tupleStream( FlowProcess<? extends Config> flowProcess, Fields selector )
     {
     return entryStream( flowProcess ).map( tupleEntry -> tupleEntry.selectTuple( selector ) );
     }
 
+  /**
+   * Method tupleStreamCopy returns a {@link Stream} of {@link Tuple} instances from the given
+   * {@link Tap} instance.
+   * <p>
+   * This method returns an Tuple instance suitable for caching.
+   * <p>
+   * Also see {@link cascading.tuple.TupleStream#tupleStreamCopy(Tap, FlowProcess)}.
+   *
+   * @param flowProcess represents the current platform configuration
+   * @param selector    the fields to select from the underlying Tuple
+   * @return a Stream of TupleE instances
+   */
   public Stream<Tuple> tupleStreamCopy( FlowProcess<? extends Config> flowProcess, Fields selector )
     {
     return entryStream( flowProcess ).map( tupleEntry -> tupleEntry.selectTupleCopy( selector ) );
