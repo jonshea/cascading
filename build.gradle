@@ -111,7 +111,7 @@ subprojects {
     }
   }
 
-  javadoc.dependsOn << prepareDist
+//  javadoc.dependsOn << prepareDist
 
   javadoc {
 
@@ -126,18 +126,18 @@ subprojects {
       bottom = copyright
       links = [
         'http://docs.oracle.com/javase/8/docs/api/',
-        'http://junit.org/junit4/javadoc/4.11/',
-        "http://${s3UploadDocs.destination}javadoc/cascading-core/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-local/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-common/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-io/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-mr1/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-tez/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-tez-stats/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-expression/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-nested/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-nested-json/".toString(),
-        "http://${s3UploadDocs.destination}javadoc/cascading-platform/".toString()
+        'http://junit.org/junit4/javadoc/4.11/'
+//        "http://${s3UploadDocs.destination}javadoc/cascading-core/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-local/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-common/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-io/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-mr1/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-tez/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-hadoop2-tez-stats/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-expression/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-nested/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-nested-json/".toString(),
+//        "http://${s3UploadDocs.destination}javadoc/cascading-platform/".toString()
       ]
     }
   }
@@ -147,10 +147,10 @@ subprojects {
     archiveClassifier = 'sources'
   }
 
-  task javadocJar( type: Jar, dependsOn: javadoc ) {
-    from javadoc
-    archiveClassifier = 'javadoc'
-  }
+//  task javadocJar( type: Jar, dependsOn: javadoc ) {
+//    from javadoc
+//    archiveClassifier = 'javadoc'
+//  }
 
   task testsJar( type: Jar, dependsOn: testClasses ) {
     from sourceSets.test.output
@@ -165,7 +165,7 @@ subprojects {
   artifacts {
     archives jar
     archives sourcesJar
-    archives javadocJar
+//    archives javadocJar
     archives testsJar
     archives testSourcesJar
     testArtifacts testsJar
@@ -202,7 +202,7 @@ subprojects {
     publications {
       maven( MavenPublication ) {
         artifact sourcesJar
-        artifact javadocJar
+        // artifact javadocJar
         artifact testsJar
         artifact testSourcesJar
 
@@ -376,6 +376,9 @@ buildLatestMeta.doLast {
           "cascading-hadoop2-mr1",
           "cascading-hadoop2-tez",
           "cascading-hadoop2-tez-stats",
+          "cascading-hadoop3-common",
+          "cascading-hadoop3-io",
+          "cascading-hadoop3-mr1",
           "cascading-expression",
           "cascading-nested",
           "cascading-nested-json",
