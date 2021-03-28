@@ -656,7 +656,7 @@ public class Hfs extends Tap<Configuration, RecordReader, OutputCollector> imple
 
     FileStatus fileStatus = getFileStatus( conf );
 
-    if( fileStatus.isDir() )
+    if( fileStatus.isDirectory() )
       return 0;
 
     return getFileSystem( conf ).getFileStatus( getPath() ).getLen();
@@ -688,7 +688,7 @@ public class Hfs extends Tap<Configuration, RecordReader, OutputCollector> imple
 
     FileStatus fileStatus = getFileStatus( conf );
 
-    if( fileStatus.isDir() )
+    if( fileStatus.isDirectory() )
       return 0;
 
     return fileStatus.getBlockSize();
@@ -722,7 +722,7 @@ public class Hfs extends Tap<Configuration, RecordReader, OutputCollector> imple
 
     FileStatus fileStatus = getFileStatus( conf );
 
-    if( fileStatus.isDir() )
+    if( fileStatus.isDirectory() )
       return 0;
 
     return fileStatus.getReplication();
@@ -798,7 +798,7 @@ public class Hfs extends Tap<Configuration, RecordReader, OutputCollector> imple
 
     FileStatus fileStatus = getFileStatus( conf );
 
-    if( !fileStatus.isDir() )
+    if( !fileStatus.isDirectory() )
       return fileStatus.getModificationTime();
 
     // todo: this should ignore the _temporary path, or not cache if found in the array
@@ -813,7 +813,7 @@ public class Hfs extends Tap<Configuration, RecordReader, OutputCollector> imple
     // filter out directories as we don't recurs into sub dirs
     for( FileStatus status : statuses )
       {
-      if( !status.isDir() )
+      if( !status.isDirectory() )
         date = Math.max( date, status.getModificationTime() );
       }
 

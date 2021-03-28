@@ -135,7 +135,7 @@ public abstract class HadoopStepStats extends BaseCachedStepStats<Configuration,
     if( getJobStatusClient() == null )
       return null;
 
-    return getJobStatusClient().getJobID().toString();
+    return getJobStatusClient().getID().toString();
     }
 
   /**

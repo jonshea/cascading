@@ -88,7 +88,7 @@ public class BaseMapReduceFlow extends HadoopFlow
       {
       try
         {
-        paths = org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getInputPaths( new Job( jobConf ) );
+        paths = org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getInputPaths( Job.getInstance( jobConf ) );
         }
       catch( IOException exception )
         {
@@ -127,7 +127,7 @@ public class BaseMapReduceFlow extends HadoopFlow
       {
       try
         {
-        path = org.apache.hadoop.mapreduce.lib.output.FileOutputFormat.getOutputPath( new Job( jobConf ) );
+        path = org.apache.hadoop.mapreduce.lib.output.FileOutputFormat.getOutputPath( Job.getInstance( jobConf ) );
         }
       catch( IOException exception )
         {

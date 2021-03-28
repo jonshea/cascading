@@ -157,7 +157,7 @@ public class MapReduceFlowPlatformTest extends PlatformTestCase
 
     Flow secondMR = new MapReduceFlow( secondConf, true );
 
-    Job job = new Job( defaultConf );
+    Job job = Job.getInstance( defaultConf );
     job.setJobName( "third-mr" );
 
     job.setOutputKeyClass( LongWritable.class );

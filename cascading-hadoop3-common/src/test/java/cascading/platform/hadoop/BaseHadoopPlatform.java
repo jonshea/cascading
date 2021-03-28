@@ -163,7 +163,7 @@ public abstract class BaseHadoopPlatform<Config extends Configuration> extends T
     if( file.exists() )
       file.delete();
 
-    if( fileSys.isFile( path ) )
+    if( fileSys.getFileStatus( path ).isFile() )
       {
       // its a file, so just copy it over
       FileUtil.copy( fileSys, path, file, false, configuration );

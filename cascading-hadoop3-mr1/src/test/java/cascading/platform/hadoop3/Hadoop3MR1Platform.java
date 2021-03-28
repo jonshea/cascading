@@ -206,8 +206,8 @@ public class Hadoop3MR1Platform extends BaseHadoopPlatform<JobConf>
 //      conf.set( "yarn.scheduler.capacity.root.default.capacity", "100" );
         // disable blacklisting hosts not to fail localhost during unit tests
         conf.setBoolean( "yarn.app.mapreduce.am.job.node-blacklisting.enable", false );
-
-        dfs = new MiniDFSCluster( conf, 4, true, null );
+        MiniDFSCluster.Builder miniDFSClusterBuilder = new MiniDFSCluster.Builder(conf);
+        dfs = miniDFSClusterBuilder.numDataNodes(4).format(true).build();
         fileSys = dfs.getFileSystem();
 
         FileSystem.setDefaultUri( conf, fileSys.getUri() );

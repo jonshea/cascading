@@ -45,6 +45,7 @@ import data.InputData;
 import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.JobCounter;
 import org.apache.hadoop.mapred.JobInProgress;
 import org.apache.hadoop.mapred.RecordReader;
 import org.junit.Test;
@@ -125,7 +126,7 @@ public class HadoopMR1TapPlatformTest extends PlatformTestCase implements Serial
 
     //Asserting we combined all partition files into one mapper
     if( getPlatform().isUseCluster() )
-      assertEquals( 1, secondFlow.getStats().getCounterValue( JobInProgress.Counter.TOTAL_LAUNCHED_MAPS ) );
+      assertEquals( 1, secondFlow.getStats().getCounterValue( JobCounter.TOTAL_LAUNCHED_MAPS ) );
 
     List<Tuple> values = getSinkAsList( secondFlow );
     assertEquals( 5, values.size() );
